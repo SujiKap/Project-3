@@ -1,0 +1,208 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.0'
+      jupytext_version: 1.0.5
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+import pandas as pd
+from scipy.stats import boxcox
+from fbprophet import Prophet
+from scipy.special import inv_boxcox
+import numpy as np
+# %matplotlib inline
+import matplotlib.pyplot as plt
+import datetime
+import copy
+
+```
+
+```{python}
+#import data
+df = pd.read_csv("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/roomdataprophet.csv")
+df.head()
+```
+
+```{python}
+#plot original data
+#plot updated data
+date_time = df['date']
+date_time = pd.to_datetime(date_time)
+y = df['y']
+
+DF = pd.DataFrame()
+DF['y'] = y
+DF = DF.set_index(date_time)
+
+fig, ax = plt.subplots()
+fig.subplots_adjust(bottom=0.3)
+plt.xticks(rotation=90)
+plt.plot(DF)
+plt.savefig("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/1.Original Plot.png")
+
+```
+
+```{python}
+#import updated data
+df1 = pd.read_csv("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/roomdataprophet2.csv")
+df1.head()
+```
+
+```{python}
+#plot updated data 
+date_time = df1['date']
+date_time = pd.to_datetime(date_time)
+y = df1['y']
+
+DF_1 = pd.DataFrame()
+DF_1['y'] = y
+DF_1 = DF_1.set_index(date_time)
+
+fig, ax = plt.subplots()
+fig.subplots_adjust(bottom=0.3)
+plt.xticks(rotation=90)
+plt.plot(DF_1)
+plt.savefig("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/2.Updated Plot.png")
+```
+
+```{python}
+#changed the above to DF1 for plot puprpose only
+#for analysis using df1
+df1.shape
+```
+
+```{python}
+df1.dtypes
+```
+
+```{python}
+#change date column to ds because prophet requires date column to be names ds
+df1['ds'] = df1['date']
+df1.head()
+```
+
+```{python}
+#change date to format required by Prophet
+df1['ds'] = pd.to_datetime(df1['date'])
+df1.head()
+
+```
+
+```{python}
+#take needed columns only
+df2=df1[['ds','y']]
+df2.head()
+```
+
+```{python}
+#check for missing values
+df2.info()
+```
+
+```{python}
+#log transform the 'y' variable to convert non-stationary data to stationary
+#this also converts trends to more linear trends
+df3=df2
+df3['y-orig'] = df3['y'] # saving original value of y
+#log transform y
+df3['y'] = np.log(df3['y'])
+df3.head()
+```
+
+```{python}
+#instantiate the model
+model = Prophet()
+#fit the model
+model.fit(df3)
+```
+
+```{python}
+#look at future until the end of 2019
+future_data = model.make_future_dataframe(periods=184)
+```
+
+```{python}
+#look at predicted data
+forecast_data = model.predict(future_data)
+forecast_data.head()
+
+#only view important columns #yhat is the forecast
+forecast_data[['ds','yhat','yhat_lower','yhat_upper']].tail()
+```
+
+```{python}
+#plot forecast data
+model.plot(forecast_data)
+plt.tight_layout()
+plt.savefig("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/3.Foreast Plot.png")
+plt.show()
+
+```
+
+```{python}
+#view seasonality and trend components
+model.plot_components(forecast_data)
+plt.tight_layout()
+plt.savefig("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/4.Components.png")
+plt.show()
+```
+
+```{python}
+#trying to inverse the forecast
+#forecast_data_inv_bx = copy.deepcopy(forecast_data)
+#forecast_data_inv_bx['yhat_inv'] = inv_boxcox(forecast_data_inv_bx['yhat'],2)
+
+#forecast_data_inv_bx.head()
+
+
+```
+
+```{python}
+#display forecast with original data instead of log transformed data
+forecast_data_orig = forecast_data # make sure we save the original forecast data
+forecast_data_orig
+forecast_data_orig['yhat'] = np.exp(forecast_data_orig['yhat'])
+forecast_data_orig['yhat_lower'] = np.exp(forecast_data_orig['yhat_lower'])
+forecast_data_orig['yhat_upper'] = np.exp(forecast_data_orig['yhat_upper'])
+
+```
+
+```{python}
+forecast_data_orig.head(100)
+```
+
+```{python}
+model.plot(forecast_data_orig)
+plt.plot(DF_1['y'], color='red')
+plt.tight_layout()
+plt.savefig("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/5.Foreast_Data Plot.png")
+plt.show() #Black line is the original log transformed data. 
+            #Need to convert this back to original format
+
+```
+
+```{python}
+#get original data back
+#df3['y_log'] = df3['y'] #copy the log-transformed data to another col
+#df3['y'] = df3['y-orig'] #copy the original data to'y
+
+```
+
+```{python}
+forecast_data_orig.to_csv("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/TS Model/Python/prophetfcst.csv")
+```
+
+```{python}
+#Evaluate forecasts
+from sklearn.metrics import mean_absolute_error  
+df4 = model.predict(df3)
+mean_absolute_error(np.exp(df3['y']), np.exp(df4['yhat']))
+```

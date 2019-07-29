@@ -1,0 +1,163 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.0'
+      jupytext_version: 1.0.5
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+import pandas as pd
+from scipy.stats import boxcox
+from fbprophet import Prophet
+from scipy.special import inv_boxcox
+import numpy as np
+# %matplotlib inline
+import matplotlib.pyplot as plt
+
+import datetime
+
+
+```
+
+```{python}
+#import data
+df = pd.read_csv("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Model/R/retailroomdataprophet.csv")
+df.head()
+```
+
+```{python}
+df.shape
+```
+
+```{python}
+df.dtypes
+```
+
+```{python}
+#change date column to ds because prophet requires date column to be names ds
+df['ds'] = df['date']
+df.head()
+```
+
+```{python}
+#change date to format required by Prophet
+df['ds'] = pd.to_datetime(df['date'])
+df.head()
+
+```
+
+```{python}
+#take needed columns only
+df1=df[['ds','y']]
+df1.head()
+```
+
+```{python}
+#check for missing values
+df1.info()
+```
+
+```{python}
+#log transform the 'y' variable to try to convert non-stationary data to starionary
+#this also converts trends to more linear trends
+df1['y-orig'] = df1['y'] # saving original value of y
+#log transform y
+df1['y'] = np.log(df1['y'])
+df1.head()
+```
+
+```{python}
+#instantiate the model
+model = Prophet()
+#fit the model
+model.fit(df1)
+```
+
+```{python}
+#look at future until the end of 2019
+future_data = model.make_future_dataframe(periods=184)
+```
+
+```{python}
+#look at predicted data
+forecast_data = model.predict(future_data)
+forecast_data.head()
+
+#only view important columns
+forecast_data[['ds','yhat','yhat_lower','yhat_upper']].tail()
+```
+
+```{python}
+#plot
+```
+
+```{python}
+
+```
+
+```{python}
+
+```
+
+```{python}
+
+```
+
+```{python}
+
+```
+
+```{python}
+
+```
+
+```{python}
+model1=Prophet(interval_width=0.95) # by default is 80%
+interval_width=0.95
+```
+
+```{python}
+df.set_index('ds')
+```
+
+```{python}
+# Apply Box-Cox Transform to value column and assign to new column y
+df['y'], lam = boxcox(df['y'])
+```
+
+```{python}
+m = fbprophet.Prophet()
+```
+
+```{python}
+m.fit(df)
+```
+
+```{python}
+future = m.make_future_dataframe(periods=365)
+```
+
+```{python}
+forecast = m.predict(future)
+```
+
+```{python}
+m.plot(forecast)
+```
+
+```{python}
+m.plot_components(forecast);
+```
+
+```{python}
+# Apply inverse Box-Cox transform to specific forecast columns
+forecast[['yhat','yhat_upper','yhat_lower']] = forecast[['yhat','yhat_upper','yhat_lower']].apply(lambda x: inv_boxcox(x, lam))
+forecast
+```

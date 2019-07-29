@@ -1,0 +1,69 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.0'
+      jupytext_version: 1.0.5
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+ # Dependencies
+from bs4 import BeautifulSoup as bs
+import requests
+import pymongo
+from splinter import Browser
+from bs4 import BeautifulSoup
+import os
+import pandas as pd
+
+```
+
+```{python}
+executable_path = {'executable_path': r"C:\Users\kapali_s\Documents\SMU\chromedriver.exe"}
+browser = Browser('chrome', **executable_path, headless=False)
+```
+
+```{python}
+#Url of the page to be scraped
+url = 'https://www.hotelplanner.com/zip/Dallas-TX-hotels-in-75201#dir-bar'
+
+browser.visit(url)
+html = browser.html
+#Create BeautifulSoup object; parse 
+soup = bs(html, 'html.parser')
+```
+
+```{python}
+#Extract name
+hotel = soup.find('a', class_='hotel-name').text
+print(hotel)
+```
+
+```{python}
+# grab Hotel names from page
+hotels = []
+
+for a in containing_href.find_all('a', class_='hotel-name'):
+    hotels.append(a.find('a', class_='hotel-name').text)
+```
+
+```{python}
+#Extract address
+add = soup.find('span', class_='address').text
+print(news_title)
+```
+
+```{python}
+# grab addresses
+address = []
+for div in containing_div.find_all('div', class_='h-phone no-redir'):
+    for address in div.find_all('div', class_='address'):
+        address.append(address.text)
+        
+```

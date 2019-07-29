@@ -1,0 +1,175 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.0'
+      jupytext_version: 1.0.5
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+ # Dependencies
+from bs4 import BeautifulSoup as bs
+import requests
+import pymongo
+from splinter import Browser
+from bs4 import BeautifulSoup
+import os
+import pandas as pd
+import time
+```
+
+```{python}
+executable_path = {'executable_path': r"C:\Users\kapali_s\Documents\SMU\chromedriver.exe"}
+browser = Browser('chrome', **executable_path, headless=False)
+```
+
+```{python}
+#Url of the page to be scraped
+url = 'https://www.hotelplanner.com/zip/Dallas-TX-hotels-in-75201'
+
+browser.visit(url)
+time.sleep(1)
+html = browser.html
+#Create BeautifulSoup object; parse 
+soup = bs(html, 'lxml')
+```
+
+```{python}
+#Extract name
+# hotel = soup.find('a', class_='hotel-name').text
+# print(hotel)
+```
+
+```{python}
+containing_div = soup.findAll('div', class_='hotel-rates')
+```
+
+# Address
+
+```{python}
+containing_div = soup.findAll('span', class_='address')
+```
+
+```{python}
+len(containing_div)
+```
+
+```{python}
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text)
+#     print(soup.find('span',class_='address').text)
+```
+
+```{python}
+r = []
+
+```
+
+#  Hotel Name
+
+```{python}
+containing_div = soup.findAll('a', class_='hotel-name')
+```
+
+```{python}
+len(containing_div)
+```
+
+```{python}
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text)
+#     print(soup.find('span',class_='address').text)
+```
+
+# Scores
+
+```{python}
+containing_div = soup.findAll('span', class_='review-score')
+```
+
+```{python}
+len(containing_div)
+```
+
+```{python}
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text)
+#     print(soup.find('span',class_='address').text)
+```
+
+```{python}
+# #Extract address
+# add = soup.find('span', class_='address').text
+# print(add)
+```
+
+```{python}
+#Rates
+containing_div = soup.findAll('div', class_='price')
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text
+
+```
+
+# Addison Hotels
+
+```{python}
+#Url of the page to be scraped
+url = 'https://www.hotelplanner.com/Hotels/3432-in-Addison-TX.html'
+
+browser.visit(url)
+time.sleep(1)
+html = browser.html
+#Create BeautifulSoup object; parse 
+soup = bs(html, 'lxml')
+
+containing_div = soup.findAll('span', class_='address')
+
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text)
+#     print(soup.find('span',class_='address').text)
+
+
+```
+
+```{python}
+containing_div = soup.findAll('a', class_='hotel-name')
+
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text)
+#     print(soup.find('span',class_='address').text)
+
+
+
+```
+
+```{python}
+containing_div = soup.findAll('span', class_='review-score')
+
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text)
+#     print(soup.find('span',class_='address').text)
+
+
+```
+
+```{python}
+#Rates
+containing_div = soup.findAll('div', class_='price')
+for r in containing_div:
+    print(r.text)
+    #print(soup.find('div', class_='hotel-rates').text
+```

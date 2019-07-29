@@ -1,0 +1,71 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.0'
+      jupytext_version: 1.0.5
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+import bs4
+
+headers={'User-Agent': 'Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405'}
+
+```
+
+```{python}
+i=1
+url = 'https://www.tripadvisor.com/Hotels-g55711-oa30-Dallas_Texas-Hotels.html' 
+
+session = requests.get(url, headers=headers)
+page = bs4.BeautifulSoup(session.text, "html.parser")
+
+containing_div = page.find('div', id='taplc_hsx_hotel_list_lite_dusty_hotels_combined_sponsored_0')
+```
+
+```{python}
+# grab Hotel names from page
+hotels = []
+
+for div in containing_div.find_all('div', class_='listing-title'):
+    hotels.append(div.find('a', class_='property_title').text)
+```
+
+```{python}
+hotels
+```
+
+```{python}
+# grab Hotel prices from page
+prices = []
+for div in containing_div.find_all('div', class_='price-wrap'):
+    for price in div.find_all('div', class_='price'):
+        prices.append(price.text)
+        
+```
+
+```{python}
+prices
+```
+
+```{python}
+len(prices)
+```
+
+```{python}
+hotels_df = pd.DataFrame({'hotel_name': hotels, 'room_price': prices})
+hotels_df.head()
+```
+
+```{python}
+hotels_df.to_csv("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Tripadvisor Data/Data/fileOne2.csv", index=False, header=True)
+```

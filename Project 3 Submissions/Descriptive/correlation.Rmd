@@ -1,0 +1,66 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.0'
+      jupytext_version: 1.0.5
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+#dependencies
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+# %matplotlib inline
+```
+
+```{python}
+#read file
+df = pd.read_csv("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/Descriptive/corrdata.csv")
+df.head()
+```
+
+```{python}
+#rearrange columns
+df1 = df[["Rooms Revenue","Rooms Available","Rooms Sold",  "ADR", "RevPAR", "Occ%"]]
+df1.head()
+```
+
+```{python}
+#rename columns for readability
+df2 = df1.rename(columns={"ADR":"Rate","RevPAR":"Revenue per Available Room", "Occ%":"Occupancy"})
+df2.head()
+```
+
+```{python}
+correlation = df2.corr()
+
+# plot the heatmap and annotation
+
+sns.set(font_scale=0.5)
+sns.heatmap(correlation,
+            cmap='RdYlGn_r',
+               #cmap='gist_earth',
+            linewidth=1.75,
+            xticklabels=correlation.columns, yticklabels=correlation.columns,
+            annot=True, annot_kws={"size":5}
+           )
+
+#edit plot
+plt.xticks(size=5)
+plt.yticks(size=5)
+
+plt.title('Rooms and Revenue Correlation Matrix', pad=20, fontweight='bold')
+
+plt.savefig("C:/Users/kapali_s/Documents/SMU/Projects/Project_3/Project 3 Submissions/Descriptive/correlationmatrix.png",
+           dpi=300, bbox_inches ="tight")
+plt.show()
+plt.close()
+```
